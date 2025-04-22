@@ -54,8 +54,8 @@ const Welcome = () => {
                 gsap.to(
                     {},
                     {
-                        duration: 0,
-                        delay: cycle * 0.15,
+                        duration: 2,
+                        delay: cycle * 0.1,
                         onComplete: () => {
                             gridImages.forEach((img, index) => {
                                 if (index < randomImages.length) {
@@ -115,7 +115,7 @@ const Welcome = () => {
 
             if (titleHeading && titleHeading.words) {
                 gsap.set(titleHeading.words, {
-                    y: "110%",
+                    y: "500%",
                 });
             }
 
@@ -243,7 +243,7 @@ const Welcome = () => {
             imagesTimeline.to(".img", {
                 clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
                 duration: 1,
-                delay: 0.5,
+                delay: 3,
                 stagger: 0.05,
                 ease: "hop",
                 onStart: () => {
@@ -298,7 +298,7 @@ const Welcome = () => {
             textTimeline.to(titleHeading.words, {
                 y: "0%",
                 duration: 1,
-                stagger: 0.1,
+                stagger: 0.5,
                 delay: 6,
                 ease: "power3.out",
             });
@@ -307,9 +307,9 @@ const Welcome = () => {
                 introCopy.words,
                 {
                     y: "0%",
-                    duration: 1,
-                    stagger: 0.1,
-                    delay: 0.25,
+                    duration: 5,
+                    stagger: 0.2,
+                    delay: 3,
                     ease: "power3.out",
                 },
                 "<"
@@ -386,7 +386,7 @@ const Welcome = () => {
             <div className="banner-image banner-image-1"><img src={img9} alt="" /></div>
             <div className="banner-image banner-image-2"><img src={img10} alt="" /></div>
 
-            <div className="intro-copy">
+            <div className="intro-copy text-large">
                 <h3>Creative Scientists</h3>
                 <h3>Build The Future</h3>
             </div>
