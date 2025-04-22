@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react';
 import img1 from '../../assets/img-1.jpg';
 import img2 from '../../assets/img-2.webp';
 import img3 from '../../assets/img-3.jpg';
@@ -15,9 +14,14 @@ import gsap from "gsap";
 import { CustomEase } from "gsap/all";
 import SplitType from "split-type";
 import { projectsData } from "../../data/projects.js";
+import {useAnimation} from "../../data/AnimationContext.jsx";
+import {useEffect} from "react";
 
-const Welcome = () => {
+const Landing = () => {
+    const { hasAnimationPlayed, setHasAnimationPlayed } = useAnimation();
+
     useEffect(() => {
+
         gsap.registerPlugin(CustomEase);
         CustomEase.create("hop", "0.9, 0, 0.1, 1");
 
@@ -36,18 +40,17 @@ const Welcome = () => {
             absolute: false,
         });
 
-        // Collection of images for shuffling - using the imported images directly
         const allImageSources = [
             img1, img2, img3, img4, img5, img6, img7, img8, img9, img10
         ];
 
         const getRandomImageSet = () => {
             const shuffled = [...allImageSources].sort(() => 0.5 - Math.random());
-            return shuffled.slice(0, 9); // Only take what we need
+            return shuffled.slice(0, 9);
         };
 
         function startImageRotation() {
-            const totalCycles = 15; // Reduced from 20
+            const totalCycles = 15;
 
             for (let cycle = 0; cycle < totalCycles; cycle++) {
                 const randomImages = getRandomImageSet();
@@ -62,7 +65,7 @@ const Welcome = () => {
                                     const imgElement = img.querySelector("img");
 
                                     if (cycle === totalCycles - 1 && img === heroImage) {
-                                        imgElement.src = imgHero; // Use the hero image at the end
+                                        imgElement.src = imgHero;
                                     } else {
                                         imgElement.src = randomImages[index];
                                     }
@@ -102,7 +105,6 @@ const Welcome = () => {
         }
 
         function setupInitialStates() {
-            // Set initial state for all elements
             gsap.set("nav", {
                 y: "-125%",
             });
@@ -119,19 +121,16 @@ const Welcome = () => {
                 });
             }
 
-            // Set initial states for grid images
             gsap.set(".img", {
                 clipPath: "polygon(0 0, 0 0, 0 0, 0 0)",
             });
 
-            // Keep all images at 1:1 scale with proper object-fit
             gsap.set(".img img", {
                 objectFit: "cover",
                 width: "100%",
                 height: "100%"
             });
 
-            // Make sure banner images are properly positioned with your CSS
             gsap.set(".banner-image", {
                 top: "45%",
                 transform: "translate(-50%, -50%) scale(0)",
@@ -147,7 +146,6 @@ const Welcome = () => {
                 left: "50%"
             });
 
-            // Ensure banner images have proper styling too
             gsap.set(".banner-image img", {
                 objectFit: "cover",
                 width: "100%",
@@ -176,14 +174,12 @@ const Welcome = () => {
                 },
             });
 
-            // First show projects and locations
             overlayTimeline.to([".projects__header", ".project-item"], {
                 opacity: 1,
                 duration: 0.15,
                 stagger: 0.075,
                 delay: 1,
                 onComplete: () => {
-                    // Start image rotation after projects and locations appear
                     startImageRotation();
                 }
             });
@@ -239,7 +235,6 @@ const Welcome = () => {
                 }
             });
 
-            // Reveal all grid images
             imagesTimeline.to(".img", {
                 clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
                 duration: 1,
@@ -247,7 +242,6 @@ const Welcome = () => {
                 stagger: 0.05,
                 ease: "hop",
                 onStart: () => {
-                    // Fade out loader
                     gsap.to(".loader", {
                         opacity: 0,
                         duration: 0.3
@@ -255,7 +249,6 @@ const Welcome = () => {
                 },
             });
 
-            // Hide regular images to focus on the hero image
             imagesTimeline.to(images, {
                 clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)",
                 duration: 1,
@@ -264,14 +257,12 @@ const Welcome = () => {
                 ease: "hop",
             });
 
-            // Slight Y adjustment for hero image container only
             imagesTimeline.to(".hero-img", {
                 y: -20,
                 duration: 1,
                 ease: "hop",
             });
 
-            // Show navigation
             imagesTimeline.to("nav", {
                 y: "0%",
                 duration: 1,
@@ -279,7 +270,6 @@ const Welcome = () => {
                 delay: 0.5
             });
 
-            // Animation for banner images - use position change only (no scale/rotation distortion)
             imagesTimeline.to(".banner-image-1", {
                 left: "40%",
                 scale: 1,
@@ -319,17 +309,41 @@ const Welcome = () => {
         function init() {
             initializeDynamicContent();
             setupInitialStates();
-            createAnimationTimelines();
+
+            if (!hasAnimationPlayed) {
+                createAnimationTimelines();
+                setHasAnimationPlayed(true);
+            } else {
+                skipToFinalState();
+            }
+        }
+
+        function skipToFinalState() {
+            gsap.set(".overlay", { opacity: 0, display: "none" });
+            gsap.set(".img", { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" });
+            gsap.set(images, { clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)" });
+            gsap.set(".hero-img", { y: -20 });
+            gsap.set("nav", { y: "0%" });
+            gsap.set(".banner-image-1", { left: "40%", scale: 1 });
+            gsap.set(".banner-image-2", { left: "60%", scale: 1 });
+
+            if (titleHeading && titleHeading.words) {
+                gsap.set(titleHeading.words, { y: "0%" });
+            }
+
+            if (introCopy && introCopy.words) {
+                gsap.set(introCopy.words, { y: "0%" });
+            }
         }
 
         init();
 
-        // Cleanup function for React useEffect
+
+
         return () => {
-            // Kill all GSAP animations to prevent memory leaks
             gsap.killTweensOf("*");
         };
-    }, []); // Empty dependency array means this runs once when component mounts
+}, []);
 
     return (
         <>
@@ -369,19 +383,7 @@ const Welcome = () => {
                 </div>
             </div>
 
-            <nav>
-                <div className="links">
-                    <a href="#">Index</a>
-                    <a href="#">Work</a>
-                </div>
-                <div className="nav-logo">
-                    <a href="#">NASA<br />PROJECT</a>
-                </div>
-                <div className="links">
-                    <a href="#">About</a>
-                    <a href="#">Contact</a>
-                </div>
-            </nav>
+
 
             <div className="banner-image banner-image-1"><img src={img9} alt="" /></div>
             <div className="banner-image banner-image-2"><img src={img10} alt="" /></div>
@@ -398,4 +400,4 @@ const Welcome = () => {
     );
 };
 
-export default Welcome;
+export default Landing;
