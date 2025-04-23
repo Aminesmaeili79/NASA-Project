@@ -332,10 +332,6 @@ title h1 {
   margin-top: 1em;
 }
 
-.error {
-  color: #ff9090;
-}
-
 .results {
   padding: 2em 4em;
   margin-top: 4em;
@@ -362,6 +358,53 @@ title h1 {
   margin-top: 4em;
 }
 
+.pagination {
+  font-size: 1.4rem;
+  padding: 4em 0;
+}
+
+.pagination-number {
+  padding: .4em .8em;
+  cursor: pointer;
+}
+
+.pagination-button {
+  padding: .4em;
+}
+
+.loader {
+  opacity: 1;
+  visibility: visible;
+}
+
+.search-results-info {
+  margin-top: 2em;
+}
+
+.article-type__tag {
+  opacity: .8;
+  font-size: 1rem;
+  padding: .4em .8em;
+}
+
+.nasa-audio-player {
+  margin: 4.8em 0 1.6em 0;
+  padding: .8em 1.6em;
+
+}
+
+.nasa-audio-player h3,
+.nasa-audio-player .timer
+{
+  color: var(--color-bg);
+}
+
+.playback-controllers button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: .4em;
+}
 
 @media (max-width: 900px) {
 .loader {

@@ -1,23 +1,23 @@
-import img1 from '../../assets/img-1.jpg';
-import img2 from '../../assets/img-2.webp';
-import img3 from '../../assets/img-3.jpg';
-import img4 from '../../assets/img-4.jpg';
-import imgHero from '../../assets/img-hero.png';
-import img5 from '../../assets/img-5.webp';
-import img6 from '../../assets/img-6.jpg';
-import img7 from '../../assets/img-7.png';
-import img8 from '../../assets/img-8.webp';
-import img9 from '../../assets/img-11.jpg';
-import img10 from '../../assets/img-12.webp';
+import img1 from '../assets/img-1.jpg';
+import img2 from '../assets/img-2.webp';
+import img3 from '../assets/img-3.jpg';
+import img4 from '../assets/img-4.jpg';
+import imgHero from '../assets/img-hero.png';
+import img5 from '../assets/img-5.webp';
+import img6 from '../assets/img-6.jpg';
+import img7 from '../assets/img-7.png';
+import img8 from '../assets/img-8.webp';
+import img9 from '../assets/img-11.jpg';
+import img10 from '../assets/img-12.webp';
 
 import gsap from "gsap";
 import { CustomEase } from "gsap/all";
 import SplitType from "split-type";
-import { projectsData } from "../../data/projects.js";
-import {useAnimation} from "../../data/AnimationContext.jsx";
+import { projectsData } from "../services/projects.js";
+import {useAnimation} from "../context/AnimationContext.jsx";
 import {useEffect} from "react";
 
-const Landing = () => {
+const LandingPage = () => {
     const { hasAnimationPlayed, setHasAnimationPlayed } = useAnimation();
 
     useEffect(() => {
@@ -343,7 +343,7 @@ const Landing = () => {
         return () => {
             gsap.killTweensOf("*");
         };
-}, []);
+    }, []);
 
     return (
         <>
@@ -384,7 +384,6 @@ const Landing = () => {
             </div>
 
 
-
             <div className="banner-image banner-image-1"><img src={img9} alt="" /></div>
             <div className="banner-image banner-image-2"><img src={img10} alt="" /></div>
 
@@ -400,4 +399,4 @@ const Landing = () => {
     );
 };
 
-export default Landing;
+export default LandingPage;

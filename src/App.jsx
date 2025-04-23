@@ -1,11 +1,10 @@
-import './App.css'
-import Landing from "./components/sections/Landing.jsx";
-import Navbar from "./components/elements/Navbar.jsx";
-import {BrowserRouter, Route, Routes} from "react-router-dom";
-import Search from "./components/sections/Search.jsx";
-import Article from "./components/sections/Article.jsx";
-import { AnimationProvider } from "./data/AnimationContext.jsx";
-import { ArticleProvider } from "./data/ArticleContext.jsx";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Navbar from './components/layouts/Navbar';
+import LandingPage from './pages/LandingPage';
+import SearchPage from './pages/SearchPage';
+import ArticlePage from './pages/ArticlePage';
+import { AnimationProvider } from './context/AnimationContext';
+import { ArticleProvider } from './context/ArticleContext';
 
 function App() {
     return (
@@ -15,15 +14,15 @@ function App() {
                     <BrowserRouter>
                         <Navbar />
                         <Routes>
-                            <Route path="/NASA-Project" element={<Landing />} />
-                            <Route path="/NASA-Project/search" element={<Search />} />
-                            <Route path="/NASA-Project/search/:title" element={<Article />} />
+                            <Route path="/NASA-Project" element={<LandingPage />} />
+                            <Route path="/NASA-Project/search" element={<SearchPage />} />
+                            <Route path="/NASA-Project/search/:title" element={<ArticlePage />} />
                         </Routes>
                     </BrowserRouter>
                 </ArticleProvider>
             </AnimationProvider>
         </>
-    )
+    );
 }
 
-export default App
+export default App;
