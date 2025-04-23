@@ -1,3 +1,4 @@
+// ArticleMedia.jsx
 import React, { useState, useEffect } from 'react';
 import { MediaDisplay } from '../../common/MediaDisplay';
 import { Loading } from '../../common/Loading';
@@ -9,6 +10,7 @@ const ArticleMedia = ({
                           title = ''
                       }) => {
     const [mediaUrl, setMediaUrl] = useState(null);
+    const [subsUrl, setSubsUrl] = useState(null);
     const [fallbackUrl, setFallbackUrl] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -60,10 +62,14 @@ const ArticleMedia = ({
 
                 if (assetDetails && assetDetails.collection && assetDetails.collection.items) {
                     let mediaFile = null;
+                    let subsFile = null;
 
                     if (mediaType === 'video') {
                         mediaFile = assetDetails.collection.items.find(item =>
                             item.href && item.href.endsWith('.mp4')
+                        );
+                        subsFile = assetDetails.collection.items.find(item =>
+                            item.href && item.href.endsWith('.srt')
                         );
                     } else if (mediaType === 'audio') {
                         mediaFile = assetDetails.collection.items.find(item =>
@@ -99,6 +105,7 @@ const ArticleMedia = ({
 
                         if (mediaType === 'video') {
                             manifest = await nasaApi.getVideoManifest(nasaId);
+                            setSubsUrl(subsFile?.href);
                         } else if (mediaType === 'audio') {
                             manifest = await nasaApi.getAudioManifest(nasaId);
                         }
@@ -113,6 +120,12 @@ const ArticleMedia = ({
                             setMediaUrl(fallbackUrl);
                             setError(`Could not find ${mediaType} file. Using preview image instead.`);
                         }
+                    }
+
+                    // Add this line to ensure subtitles are set when we have them
+                    if (subsFile) {
+                        debugInfo.foundSubtitlesFile = subsFile.href;
+                        setSubsUrl(subsFile.href);
                     }
                 } else {
                     throw new Error(`No asset details found for ${mediaType}`);
@@ -146,6 +159,7 @@ const ArticleMedia = ({
             <MediaDisplay
                 mediaType={mediaType}
                 mediaUrl={mediaUrl}
+                subsUrl={subsUrl}
                 fallbackUrl={fallbackUrl}
                 title={title || (articleData?.data[0]?.title || 'Media')}
                 onError={() => {
