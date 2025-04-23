@@ -1,27 +1,28 @@
-import img1 from '../../assets/img-1.jpg';
-import img2 from '../../assets/img-2.webp';
-import img3 from '../../assets/img-3.jpg';
-import img4 from '../../assets/img-4.jpg';
-import imgHero from '../../assets/img-hero.png';
-import img5 from '../../assets/img-5.webp';
-import img6 from '../../assets/img-6.jpg';
-import img7 from '../../assets/img-7.png';
-import img8 from '../../assets/img-8.webp';
-import img9 from '../../assets/img-11.jpg';
-import img10 from '../../assets/img-12.webp';
+import React, { useEffect } from 'react';
+import img1 from '../assets/img-1.jpg';
+import img2 from '../assets/img-2.webp';
+import img3 from '../assets/img-3.jpg';
+import img4 from '../assets/img-4.jpg';
+import imgHero from '../assets/img-hero.png';
+import img5 from '../assets/img-5.webp';
+import img6 from '../assets/img-6.jpg';
+import img7 from '../assets/img-7.png';
+import img8 from '../assets/img-8.webp';
+import img9 from '../assets/img-11.jpg';
+import img10 from '../assets/img-12.webp';
 
 import gsap from "gsap";
 import { CustomEase } from "gsap/all";
 import SplitType from "split-type";
-import { projectsData } from "../../data/projects.js";
-import {useAnimation} from "../../data/AnimationContext.jsx";
-import {useEffect} from "react";
+import { projectsData } from "../services/projects.js";
+import { useAnimation } from "../context/AnimationContext";
 
-const Landing = () => {
+// Direct copy of the original working Landing component with minimal changes
+
+const LandingPage = () => {
     const { hasAnimationPlayed, setHasAnimationPlayed } = useAnimation();
 
     useEffect(() => {
-
         gsap.registerPlugin(CustomEase);
         CustomEase.create("hop", "0.9, 0, 0.1, 1");
 
@@ -30,6 +31,8 @@ const Landing = () => {
         const gridImages = gsap.utils.toArray(".img");
         const heroImage = document.querySelector(".img.hero-img");
         const images = gridImages.filter((img) => img != heroImage);
+
+        // Split text
         const introCopy = new SplitType(".intro-copy h3", {
             type: "words",
             absolute: false,
@@ -79,6 +82,12 @@ const Landing = () => {
 
         function initializeDynamicContent() {
             if (projectsData && projectsContainer) {
+                projectsContainer.innerHTML = ''; // Clear existing content first
+                const projectsHeader = document.createElement("div");
+                projectsHeader.className = "projects__header";
+                projectsHeader.innerHTML = '<p>Projects</p><p>By</p>';
+                projectsContainer.appendChild(projectsHeader);
+
                 projectsData.forEach((project) => {
                     const projectItem = document.createElement("div");
                     projectItem.className = "project-item";
@@ -93,6 +102,12 @@ const Landing = () => {
             }
 
             if (projectsData && locationsContainer) {
+                locationsContainer.innerHTML = ''; // Clear existing content first
+                const locationsHeader = document.createElement("div");
+                locationsHeader.className = "locations__header";
+                locationsHeader.innerHTML = '<p>Locations</p>';
+                locationsContainer.appendChild(locationsHeader);
+
                 projectsData.forEach((project) => {
                     const locationItem = document.createElement("div");
                     locationItem.className = "location-item";
@@ -102,9 +117,37 @@ const Landing = () => {
                     locationsContainer.appendChild(locationItem);
                 });
             }
+
+            // Set initial opacity of dynamic content
+            gsap.set([".projects__header", ".project-item", ".locations__header", ".location-item"], {
+                opacity: 0
+            });
         }
 
         function setupInitialStates() {
+            // Hide the content initially
+            document.querySelectorAll(".image-grid, .banner-image, .intro-copy, .title").forEach(el => {
+                el.style.opacity = "0";
+                el.style.visibility = "hidden";
+            });
+
+            // Make sure overlay is visible
+            const overlay = document.querySelector(".overlay");
+            if (overlay) {
+                overlay.style.opacity = "1";
+                overlay.style.visibility = "visible";
+                overlay.style.display = "flex";
+                overlay.style.zIndex = "9999";
+            }
+
+            // Make loader visible
+            const loader = document.querySelector(".loader");
+            if (loader) {
+                loader.style.opacity = "1";
+                loader.style.visibility = "visible";
+            }
+
+            // Set up GSAP initial states
             gsap.set("nav", {
                 y: "-125%",
             });
@@ -232,6 +275,11 @@ const Landing = () => {
                 delay: 1.5,
                 onComplete: () => {
                     gsap.set(".overlay", { display: "none" });
+
+                    // Make content visible after overlay disappears
+                    document.querySelectorAll(".image-grid, .banner-image, .intro-copy, .title").forEach(el => {
+                        el.style.visibility = "visible";
+                    });
                 }
             });
 
@@ -240,12 +288,14 @@ const Landing = () => {
                 duration: 1,
                 delay: 3,
                 stagger: 0.05,
+                opacity: 1,
                 ease: "hop",
                 onStart: () => {
                     gsap.to(".loader", {
                         opacity: 0,
                         duration: 0.3
                     });
+                    document.querySelector(".image-grid").style.opacity = "1";
                 },
             });
 
@@ -267,7 +317,11 @@ const Landing = () => {
                 y: "0%",
                 duration: 1,
                 ease: "hop",
-                delay: 0.5
+                delay: 0.5,
+                onStart: () => {
+                    document.querySelector("nav").style.opacity = "1";
+                    document.querySelector("nav").style.visibility = "visible";
+                }
             });
 
             imagesTimeline.to(".banner-image-1", {
@@ -275,7 +329,12 @@ const Landing = () => {
                 scale: 1,
                 duration: 1,
                 ease: "power2.out",
-                delay: 1
+                delay: 1,
+                onStart: () => {
+                    document.querySelectorAll(".banner-image").forEach(el => {
+                        el.style.opacity = "1";
+                    });
+                }
             });
 
             imagesTimeline.to(".banner-image-2", {
@@ -284,6 +343,15 @@ const Landing = () => {
                 duration: 1,
                 ease: "power2.out",
             }, "<0.2");
+
+            imagesTimeline.to(".intro-copy, .title", {
+                opacity: 1,
+                duration: 0.5,
+                onStart: () => {
+                    document.querySelector(".intro-copy").style.opacity = "1";
+                    document.querySelector(".title").style.opacity = "1";
+                }
+            }, "<0.5");
 
             textTimeline.to(titleHeading.words, {
                 y: "0%",
@@ -306,20 +374,17 @@ const Landing = () => {
             );
         }
 
-        function init() {
-            initializeDynamicContent();
-            setupInitialStates();
-
-            if (!hasAnimationPlayed) {
-                createAnimationTimelines();
-                setHasAnimationPlayed(true);
-            } else {
-                skipToFinalState();
-            }
-        }
-
         function skipToFinalState() {
+            // Hide the overlay immediately
             gsap.set(".overlay", { opacity: 0, display: "none" });
+
+            // Make all content visible
+            document.querySelectorAll(".image-grid, .banner-image, .intro-copy, .title, nav").forEach(el => {
+                el.style.opacity = "1";
+                el.style.visibility = "visible";
+            });
+
+            // Set final states for all elements
             gsap.set(".img", { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" });
             gsap.set(images, { clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)" });
             gsap.set(".hero-img", { y: -20 });
@@ -334,20 +399,37 @@ const Landing = () => {
             if (introCopy && introCopy.words) {
                 gsap.set(introCopy.words, { y: "0%" });
             }
+
+            // Ensure hero image is visible
+            const heroImgElement = heroImage?.querySelector("img");
+            if (heroImgElement) {
+                heroImgElement.src = imgHero;
+            }
+        }
+
+        function init() {
+            console.log("Animation initialization starting");
+            initializeDynamicContent();
+            setupInitialStates();
+
+            if (!hasAnimationPlayed) {
+                createAnimationTimelines();
+                setHasAnimationPlayed(true);
+            } else {
+                skipToFinalState();
+            }
         }
 
         init();
 
-
-
         return () => {
             gsap.killTweensOf("*");
         };
-}, []);
+    }, [hasAnimationPlayed, setHasAnimationPlayed]);
 
     return (
         <>
-            <div className="overlay">
+            <div className="overlay" style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#000', zIndex: 9999, display: 'flex', opacity: 1, visibility: 'visible'}}>
                 <div className="projects">
                     <div className="projects__header">
                         <p>Projects</p>
@@ -383,8 +465,6 @@ const Landing = () => {
                 </div>
             </div>
 
-
-
             <div className="banner-image banner-image-1"><img src={img9} alt="" /></div>
             <div className="banner-image banner-image-2"><img src={img10} alt="" /></div>
 
@@ -394,10 +474,10 @@ const Landing = () => {
             </div>
 
             <div className="title">
-                <h1><a href="https://www.nasa.gov/">Find Out More About NASA</a></h1>
+                <h1><a href="https://www.nasa.gov/" target="_blank" rel="noopener noreferrer">Find Out More About NASA</a></h1>
             </div>
         </>
     );
 };
 
-export default Landing;
+export default LandingPage;

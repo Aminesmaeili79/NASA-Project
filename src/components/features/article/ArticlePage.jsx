@@ -1,23 +1,24 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { ArticleContext } from '../../data/ArticleContext.jsx'
-import { nasaApi } from "../../data/nasaAPI.jsx";
+import React, { useContext, useEffect, useState, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { ArticleContext } from '../../../context/ArticleContext';
+import { nasaApi } from "../../../services/nasaApi";
 
-const Article = () => {
-    const { article, articleType, setArticle, setArticleType } = useContext(ArticleContext)
-    const { title } = useParams()
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState(null)
-    const [videoUrl, setVideoUrl] = useState(null)
-    const [isFullContext, setIsFullContext] = useState(false)
+const ArticlePage = () => {
+    const { article, articleType, setArticle, setArticleType } = useContext(ArticleContext);
+    const { title } = useParams();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [videoUrl, setVideoUrl] = useState(null);
+    const [isFullContext, setIsFullContext] = useState(false);
+    const articleContextRef = useRef(null);
     const navigate = useNavigate();
 
-    const articleContext = document.querySelector(".article-context");
-
     const handleFullContext = () => {
-        setIsFullContext(prev => !prev)
-        articleContext.classList.toggle("context-hidden")
-    }
+        setIsFullContext(prev => !prev);
+        if (articleContextRef.current) {
+            articleContextRef.current.classList.toggle("context-hidden");
+        }
+    };
 
     useEffect(() => {
         const fetchArticleByTitle = async () => {
@@ -137,8 +138,15 @@ const Article = () => {
                     Return to Search
                 </button>
             </div>
-        )
+        );
     }
+
+    // Set initial state for the article context
+    useEffect(() => {
+        if (articleContextRef.current) {
+            articleContextRef.current.classList.add("context-hidden");
+        }
+    }, [article]);
 
     return (
         <main className="article-container flex flex-col items-center justify-center min-h-screen py-16 px-4">
@@ -195,13 +203,18 @@ const Article = () => {
 
                 <p className="text-gray-600 mb-4 text-center text-[1.6rem]">Date: {article.data[0].date_created.split('T')[0]}</p>
 
-                <div className="article-context prose lg:prose-xl max-w-full text-[1.8rem] context-hidden">
+                <div ref={articleContextRef} className="article-context prose lg:prose-xl max-w-full text-[1.8rem]">
                     <p>{article.data[0].description}</p>
                 </div>
-                {articleContext.length > 300 ? isFullContext ? <p onClick={handleFullContext} className="text-gray-600 text-[2rem]">show more...</p> : <p onClick={handleFullContext} className="text-gray-600 text-[2rem]">show less</p> : null}
+
+                {article.data[0].description && article.data[0].description.length > 300 && (
+                    <p onClick={handleFullContext} className="text-gray-600 text-[2rem] cursor-pointer text-center">
+                        {isFullContext ? "show less" : "show more..."}
+                    </p>
+                )}
 
                 {article.data[0].keywords && article.data[0].keywords.length > 0 && (
-                    <div className="keywords">
+                    <div className="keywords mt-8">
                         <h3 className="text-[2.2rem] mb-2">Keywords:</h3>
                         <div className="flex flex-wrap gap-2">
                             {article.data[0].keywords.map((keyword, index) => (
@@ -214,7 +227,7 @@ const Article = () => {
                 )}
             </div>
         </main>
-    )
-}
+    );
+};
 
-export default Article
+export default ArticlePage;
