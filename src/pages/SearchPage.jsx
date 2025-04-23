@@ -288,7 +288,7 @@ const SearchPage = () => {
 
                 {!loading && results.map((item, index) => (
                     <Link
-                        to={`/NASA-Project/search/${encodeURIComponent(item.data[0].title)}`}
+                        to={`/search/${encodeURIComponent(item.data[0].title)}`}
                         onClick={() => {
                             let itemType = "image";
 

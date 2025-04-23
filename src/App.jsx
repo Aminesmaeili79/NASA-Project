@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/layouts/Navbar';
 import LandingPage from './pages/LandingPage';
 import SearchPage from './pages/SearchPage';
@@ -11,14 +11,14 @@ function App() {
         <>
             <AnimationProvider>
                 <ArticleProvider>
-                    <BrowserRouter>
+                    <HashRouter>
                         <Navbar />
                         <Routes>
-                            <Route path="/NASA-Project" element={<LandingPage />} />
-                            <Route path="/NASA-Project/search" element={<SearchPage />} />
-                            <Route path="/NASA-Project/search/:title" element={<ArticlePage />} />
+                            <Route path="/" element={<LandingPage />} />
+                            <Route path="/search" element={<SearchPage />} />
+                            <Route path="/search/:title" element={<ArticlePage />} />
                         </Routes>
-                    </BrowserRouter>
+                    </HashRouter>
                 </ArticleProvider>
             </AnimationProvider>
         </>

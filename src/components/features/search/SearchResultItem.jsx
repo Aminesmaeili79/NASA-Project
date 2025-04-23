@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 const SearchResultItem = ({
                               item,
                               onSelect,
-                              baseUrl = '/NASA-Project/search'
+                              baseUrl = '/search'
                           }) => {
     const determineMediaType = () => {
         if (item.data?.[0]?.media_type) {
