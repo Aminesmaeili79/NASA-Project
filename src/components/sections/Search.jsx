@@ -1,13 +1,30 @@
-import React, {useState} from 'react'
+import React, {useContext, useState} from 'react'
 import {nasaApi} from "../../data/nasaAPI.jsx";
-
-
+import {Link} from "react-router-dom";
+import {ArticleContext} from "../../data/ArticleContext.jsx";
 
 const Search = () => {
+    const { setArticle } = useContext(ArticleContext);
+
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [searchType, setSearchType] = useState([]);
+
+    const handleType = (type) => {
+        const updatedTypes = [...searchType];
+
+        const index = updatedTypes.indexOf(type);
+
+        if (index === -1) {
+            updatedTypes.push(type);
+        } else {
+            updatedTypes.splice(index, 1);
+        }
+
+        setSearchType(updatedTypes);
+    };
 
     const handleSearch = async (e) => {
         e.preventDefault();
@@ -19,42 +36,79 @@ const Search = () => {
 
         try {
             if (results) {
-               setResults([]);
+                setResults([]);
             }
-            const data = await nasaApi.searchMedia(query);
-            if ( !data.collection.items.length) {
+
+            const searchTypeString = searchType.join(',');
+
+            const data = await nasaApi.searchMedia(query, searchTypeString);
+            if (!data.collection.items.length) {
                 setError("Failed to fetch any data")
             }
             setResults(data.collection.items || []);
         } catch (err) {
             console.error(err);
+            setError("An error occurred while fetching data");
         } finally {
             setLoading(false);
         }
     }
 
-
     return (
         <main className="flex flex-col justify-center items-center mt-48">
-           <form onSubmit={handleSearch} className="search flex flex-col gap-8 items-center">
-               <div className="search__box">
-                  <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search For NASA media..." className="search-input px-4" type="text"/>
-               </div>
-               <div className="search__options text-4xl flex justify-center gap-3">
-                   <div className="search__option">
-                       <input className="option-input" type="checkbox" name="audio" id="audio" value="audio"/>
-                       <label htmlFor="audio">Audio</label>
-                   </div>
-                   <div className="search__option">
-                       <input className="option-input" type="checkbox" name="image" id="image" value="image"/>
-                       <label htmlFor="image">Image</label>
-                   </div>
-                   <div className="search__option">
-                       <input className="option-input" type="checkbox" name="video" id="video" value="video"/>
-                       <label htmlFor="video">Video</label>
-                   </div>
-               </div>
-           </form>
+            <form onSubmit={handleSearch} className="search flex flex-col gap-8 items-center">
+                <div className="search__box">
+                    <input
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder="Search For NASA media..."
+                        className="search-input px-4"
+                        type="text"
+                    />
+                </div>
+                <div className="search__options text-4xl flex justify-center gap-3">
+                    <div className="search__option">
+                        <input
+                            className="option-input"
+                            type="checkbox"
+                            name="audio"
+                            id="audio"
+                            value="audio"
+                            checked={searchType.includes('audio')}
+                            onChange={() => handleType('audio')}
+                        />
+                        <label htmlFor="audio">Audio</label>
+                    </div>
+                    <div className="search__option">
+                        <input
+                            className="option-input"
+                            type="checkbox"
+                            name="image"
+                            id="image"
+                            value="image"
+                            checked={searchType.includes('image')}
+                            onChange={() => handleType('image')}
+                        />
+                        <label htmlFor="image">Image</label>
+                    </div>
+                    <div className="search__option">
+                        <input
+                            className="option-input"
+                            type="checkbox"
+                            name="video"
+                            id="video"
+                            value="video"
+                            checked={searchType.includes('video')}
+                            onChange={() => handleType('video')}
+                        />
+                        <label htmlFor="video">Video</label>
+                    </div>
+                </div>
+                <button type="submit" className="search-button px-6 py-2 rounded">
+                    Search
+                </button>
+            </form>
+
             <div className="results grid grid-cols-1 md:grid-cols-3 gap-y-16 gap-x-8">
                 {loading && <div className="loading flex gap-4 items-center text-6xl col-span-full">
                     <div role="status">
@@ -73,10 +127,28 @@ const Search = () => {
                 {error && <div className="error text-6xl col-span-full">{error}</div>}
 
                 {results.map((item, index) => (
-                    <div  className=" flex flex-col gap-8 items-center text-center" key={index}>
+                    <Link
+                        to={`/NASA-Project/search/${encodeURIComponent(item.data[0].title)}`}
+                        onClick={() => {
+                            let itemType = "image";
+
+                            if (item.data[0].media_type) {
+                                itemType = item.data[0].media_type;
+                                if (itemType === "video") {
+                                    console.log(item);
+                                }
+                            }
+                            else if (searchType.length === 1) {
+                                itemType = searchType[0];
+                            }
+
+                            setArticle(item, itemType);
+                        }}
+                        className="cursor-pointer flex flex-col gap-8 items-center text-center"
+                        key={index}
+                    >
                         {item.links && item.links[0]?.href && (
                             <img
-                                onClick={() => console.log(item.data[0].nasa_id)}
                                 src={item.links[0].href}
                                 alt={item.data?.[0]?.title || 'NASA media'}
                             />
@@ -86,10 +158,11 @@ const Search = () => {
                             <p>{item.data?.[0]?.description?.substring(0, 100)}...</p>
                             <p className="date">{item.data?.[0]?.date_created?.split('T')[0]}</p>
                         </div>
-                    </div>
+                    </Link>
                 ))}
             </div>
         </main>
     )
 }
+
 export default Search

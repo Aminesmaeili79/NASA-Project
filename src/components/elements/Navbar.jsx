@@ -1,7 +1,5 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import Landing from "../sections/Landing.jsx";
-import Search from "../sections/Search.jsx";
 
 
 const Navbar = () => {
