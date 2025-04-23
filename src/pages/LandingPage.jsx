@@ -50,15 +50,15 @@ const LandingPage = () => {
         };
 
         function startImageRotation() {
-            const totalCycles = 15;
+            const totalCycles = 25;
 
             for (let cycle = 0; cycle < totalCycles; cycle++) {
                 const randomImages = getRandomImageSet();
                 gsap.to(
                     {},
                     {
-                        duration: 2,
-                        delay: cycle * 0.1,
+                        duration: 3,
+                        delay: cycle * 0.075,
                         onComplete: () => {
                             gridImages.forEach((img, index) => {
                                 if (index < randomImages.length) {
@@ -382,7 +382,6 @@ const LandingPage = () => {
                     <div className="img"><img src={img8} alt="" /></div>
                 </div>
             </div>
-
 
             <div className="banner-image banner-image-1"><img src={img9} alt="" /></div>
             <div className="banner-image banner-image-2"><img src={img10} alt="" /></div>

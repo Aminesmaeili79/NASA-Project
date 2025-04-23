@@ -12,12 +12,12 @@ function App() {
             <AnimationProvider>
                 <ArticleProvider>
                     <HashRouter>
-                        <Navbar />
-                        <Routes>
-                            <Route path="/" element={<LandingPage />} />
-                            <Route path="/search" element={<SearchPage />} />
-                            <Route path="/search/:title" element={<ArticlePage />} />
-                        </Routes>
+                            <Navbar />
+                            <Routes>
+                                <Route path="/" element={<LandingPage />} />
+                                <Route path="/search" element={<SearchPage />} />
+                                <Route path="/search/:title" element={<ArticlePage />} />
+                            </Routes>
                     </HashRouter>
                 </ArticleProvider>
             </AnimationProvider>
