@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { nasaApi } from '../services/nasaApi';
 import { ArticleContext } from '../context/ArticleContext';
+import audioImage from '../assets/audio.png'
 
 const SearchPage = () => {
     const { setArticle } = useContext(ArticleContext);
@@ -312,9 +313,11 @@ const SearchPage = () => {
                                     loading="lazy"
                                 />
                             ) : (
-                                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                                    <span>No preview</span>
-                                </div>
+                                <img
+                                    src={audioImage}
+                                    alt={item.data?.[0].title || 'NASA media'}
+                                    className="w-full h-full bg-gray-200 flex items-center justify-center">
+                                </img>
                             )}
 
                             {item.data?.[0]?.media_type && (

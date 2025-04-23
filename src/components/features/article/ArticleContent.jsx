@@ -20,17 +20,19 @@ const ArticleContent = ({
     };
 
     return (
-        <div className="article-content flex flex-col gap-4 max-w-4xl mx-auto">
-            <div className={`prose lg:prose-xl max-w-full text-lg md:text-xl ${isLongContent && !expanded ? 'line-clamp-4' : ''}`}>
-                <p>{description || 'No description available.'}</p>
+        <div className="article-content mt-4">
+            <div className="description">
+                <p className={`${!expanded && isLongContent ? 'line-clamp-4' : ''}`}>
+                    {description || 'No description available.'}
+                </p>
             </div>
 
             {isLongContent && (
-                <div className="text-center mt-2">
+                <div className="mt-2">
                     <Button
-                        variant="outline"
+                        variant="secondary"
+                        size="sm"
                         onClick={toggleExpanded}
-                        size="small"
                     >
                         {expanded ? 'Show Less' : 'Show More'}
                     </Button>
@@ -38,14 +40,13 @@ const ArticleContent = ({
             )}
 
             {keywords && keywords.length > 0 && (
-                <div className="keywords mt-8">
-                    <h3 className="text-xl mb-2">Keywords:</h3>
-                    <div className="flex flex-wrap gap-2">
+                <div className="keywords mt-4">
+                    <h4 className="text-sm font-semibold">
+                        Keywords:
+                    </h4>
+                    <div className="flex flex-wrap gap-2 mt-1">
                         {keywords.map((keyword, index) => (
-                            <span
-                                key={`keyword-${index}`}
-                                className="px-3 py-1 bg-gray-800 rounded-full text-sm"
-                            >
+                            <span key={index} className="px-2 py-1 bg-gray-100 rounded-md text-xs">
                 {keyword}
               </span>
                         ))}
@@ -57,4 +58,3 @@ const ArticleContent = ({
 };
 
 export default ArticleContent;
-

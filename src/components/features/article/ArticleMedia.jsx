@@ -15,86 +15,165 @@ const ArticleMedia = ({
     const [fallbackUrl, setFallbackUrl] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [debug, setDebug] = useState({});
 
     // Set fallback URL from article links
     useEffect(() => {
         if (articleData?.links && articleData.links[0]?.href) {
             setFallbackUrl(articleData.links[0].href);
-            // Default media URL is the first link
+            // Default media URL is the first link if no specific media URL is set yet
             if (!mediaUrl) {
                 setMediaUrl(articleData.links[0].href);
             }
         }
-    }, [articleData, mediaUrl]);
+    }, [articleData]);
 
-    // Fetch video URL if article is a video
+    // Fetch media URL based on mediaType
     useEffect(() => {
-        const fetchVideoUrl = async () => {
-            if (articleData && mediaType === 'video') {
-                setLoading(true);
+        const fetchMediaUrl = async () => {
+            if (!articleData || !articleData.data || !articleData.data[0]) {
+                setError("No article data available");
+                return;
+            }
 
-                try {
-                    const nasaId = articleData.data[0].nasa_id;
+            setLoading(true);
+            setError(null);
+            const debugInfo = {};
 
-                    if (!nasaId) {
-                        throw new Error("No NASA ID found for this video");
-                    }
+            try {
+                const nasaId = articleData.data[0].nasa_id;
+                debugInfo.nasaId = nasaId;
 
-                    const assetDetails = await nasaApi.getVideoAssetDetails(nasaId);
+                if (!nasaId) {
+                    throw new Error(`No NASA ID found for this ${mediaType}`);
+                }
 
-                    if (assetDetails && assetDetails.collection && assetDetails.collection.items) {
-                        const mp4File = assetDetails.collection.items.find(item =>
+                let assetDetails;
+
+                // Get asset details based on media type
+                if (mediaType === 'video') {
+                    assetDetails = await nasaApi.getVideoAssetDetails(nasaId);
+                } else if (mediaType === 'audio') {
+                    assetDetails = await nasaApi.getAudioAssetDetails(nasaId);
+                } else {
+                    // For images, we likely already have the URL from the links
+                    setLoading(false);
+                    return;
+                }
+
+                debugInfo.assetDetails = {
+                    hasCollection: !!assetDetails?.collection,
+                    itemCount: assetDetails?.collection?.items?.length || 0
+                };
+
+                if (assetDetails && assetDetails.collection && assetDetails.collection.items) {
+                    let mediaFile = null;
+
+                    // Find appropriate file based on media type
+                    if (mediaType === 'video') {
+                        mediaFile = assetDetails.collection.items.find(item =>
                             item.href && item.href.endsWith('.mp4')
                         );
+                    } else if (mediaType === 'audio') {
+                        // Look for common audio formats
+                        mediaFile = assetDetails.collection.items.find(item =>
+                                item.href && (
+                                    item.href.endsWith('.mp3') ||
+                                    item.href.endsWith('.wav') ||
+                                    item.href.endsWith('.ogg') ||
+                                    item.href.endsWith('.m4a')
+                                )
+                        );
 
-                        if (mp4File) {
-                            setMediaUrl(mp4File.href);
-                        } else {
-                            // Try getting manifest
-                            const manifest = await nasaApi.getVideoManifest(nasaId);
+                        // Log all available files to help with debugging
+                        debugInfo.availableFiles = assetDetails.collection.items
+                            .filter(item => item.href)
+                            .map(item => item.href);
+                    }
 
-                            if (manifest && manifest.location) {
-                                setMediaUrl(manifest.location);
-                            } else if (fallbackUrl) {
-                                // Use preview URL as fallback
-                                setMediaUrl(fallbackUrl);
-                                console.warn("Using preview URL as fallback - may not be a video");
-                            }
+                    if (mediaFile) {
+                        debugInfo.foundMediaFile = mediaFile.href;
+                        setMediaUrl(mediaFile.href);
+                    } else {
+                        // Try getting manifest for additional info
+                        let manifest;
+
+                        if (mediaType === 'video') {
+                            manifest = await nasaApi.getVideoManifest(nasaId);
+                        } else if (mediaType === 'audio') {
+                            manifest = await nasaApi.getAudioManifest(nasaId);
+                        }
+
+                        debugInfo.manifest = manifest ? 'Retrieved' : 'Not available';
+
+                        if (manifest && manifest.location) {
+                            debugInfo.manifestLocation = manifest.location;
+                            setMediaUrl(manifest.location);
+                        } else if (fallbackUrl) {
+                            debugInfo.usingFallback = true;
+                            setMediaUrl(fallbackUrl);
+                            setError(`Could not find ${mediaType} file. Using preview image instead.`);
                         }
                     }
-                } catch (err) {
-                    console.error("Error fetching video URL:", err);
-                    setError("Could not load video. Showing preview image instead.");
-                    if (fallbackUrl) {
-                        setMediaUrl(fallbackUrl);
-                    }
-                } finally {
-                    setLoading(false);
+                } else {
+                    throw new Error(`No asset details found for ${mediaType}`);
                 }
+            } catch (err) {
+                console.error(`Error fetching ${mediaType} URL:`, err);
+                debugInfo.error = err.message;
+                setError(`Could not load ${mediaType}. ${err.message}`);
+                if (fallbackUrl) {
+                    setMediaUrl(fallbackUrl);
+                }
+            } finally {
+                setLoading(false);
+                setDebug(debugInfo);
             }
         };
 
-        if (mediaType === 'video') {
-            fetchVideoUrl();
+        if ((mediaType === 'video' || mediaType === 'audio') && articleData) {
+            fetchMediaUrl();
         }
     }, [articleData, mediaType, fallbackUrl]);
 
     if (loading) {
-        return <Loading text="Loading media..." />;
+        return <Loading />;
     }
 
+    // Add development-only debugging display
+    const showDebugInfo = process.env.NODE_ENV === 'development';
+
     return (
-        <div className="article-media flex flex-col items-center mb-8">
+        <div className="article-media">
             <MediaDisplay
                 mediaType={mediaType}
                 mediaUrl={mediaUrl}
                 fallbackUrl={fallbackUrl}
-                title={title}
-                className="max-w-full rounded-lg shadow-lg"
+                title={title || (articleData?.data[0]?.title || 'Media')}
+                onError={() => {
+                    console.error(`Error playing ${mediaType} from URL: ${mediaUrl}`);
+                    if (!error) {
+                        setError(`${mediaType.charAt(0).toUpperCase() + mediaType.slice(1)} could not be played`);
+                    }
+                }}
+                className="mb-2"
             />
 
             {error && (
-                <p className="mt-2 text-yellow-500">{error}</p>
+                <div className="error-message my-2 text-red-500 text-sm">
+                    {error}
+                </div>
+            )}
+
+            {showDebugInfo && Object.keys(debug).length > 0 && (
+                <div className="debug-info p-3 mt-4 bg-gray-100 rounded text-xs font-mono">
+                    <details>
+                        <summary className="cursor-pointer font-bold">Debug Info</summary>
+                        <pre className="mt-2 overflow-auto max-h-60">
+              {JSON.stringify(debug, null, 2)}
+            </pre>
+                    </details>
+                </div>
             )}
         </div>
     );

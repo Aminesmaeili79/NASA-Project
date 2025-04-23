@@ -366,48 +366,9 @@ title h1 {
   padding: .4em;
 }
 
-/* Hide content initially to prevent flash before animation */
-.image-grid, .banner-image, .intro-copy, .title, nav {
-  opacity: 0;
-  visibility: hidden;
-}
-
-/* Make sure the loader is visible from the start */
 .loader {
   opacity: 1;
   visibility: visible;
-}
-
-/* Add these rules to your index.css file to fix the navbar visibility */
-
-/* Default state for navbar - visible everywhere */
-nav {
-  opacity: 1 !important;
-  visibility: visible !important;
-  transform: translateY(0) !important;
-}
-
-/* Only hide navbar on landing page initially */
-body.landing-page-active nav {
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-125%);
-}
-
-/* Make sure overlay is visible */
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100svh;
-  padding: 2em;
-  background: #000;
-  color: #fff;
-  display: flex;
-  gap: 2em;
-  overflow: hidden;
-  z-index: 9999;
 }
 
 @media (max-width: 900px) {

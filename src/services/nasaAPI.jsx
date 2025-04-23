@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const NASA_API_BASE_URL = 'https://images-api.nasa.gov';
-const NASA_VIDEO_API_URL = 'https://images-assets.nasa.gov';
+const NASA_ASSETS_URL = 'https://images-assets.nasa.gov';
 const NASA_API_KEY = import.meta.env.NASA_API_KEY;
 
 // Create axios instance with default configuration
@@ -105,6 +105,22 @@ export const nasaApi = {
     },
 
     /**
+     * Get asset details for an audio file
+     * @param {string} nasaId - NASA ID of the asset
+     * @returns {Promise<Object>} - Asset details
+     */
+    getAudioAssetDetails: async (nasaId) => {
+        return withRetry(async () => {
+            const response = await apiClient.get(`/asset/${nasaId}`, {
+                params: {
+                    api_key: NASA_API_KEY
+                }
+            });
+            return response.data;
+        });
+    },
+
+    /**
      * Get video manifest
      * @param {string} nasaId - NASA ID of the asset
      * @returns {Promise<Object>} - Video manifest
@@ -121,20 +137,36 @@ export const nasaApi = {
     },
 
     /**
-     * Get video file
-     * @param {string} fileUrl - URL of the video file
-     * @returns {Promise<Object>} - Video file
+     * Get audio manifest
+     * @param {string} nasaId - NASA ID of the asset
+     * @returns {Promise<Object>} - Audio manifest
      */
-    getVideoFile: async (fileUrl) => {
+    getAudioManifest: async (nasaId) => {
+        return withRetry(async () => {
+            const response = await apiClient.get(`/asset/${nasaId}/metadata`, {
+                params: {
+                    api_key: NASA_API_KEY
+                }
+            });
+            return response.data;
+        });
+    },
+
+    /**
+     * Get media file (video or audio)
+     * @param {string} fileUrl - URL of the media file
+     * @returns {Promise<Object>} - Media file
+     */
+    getMediaFile: async (fileUrl) => {
         try {
             const fullUrl = fileUrl.startsWith('http')
                 ? fileUrl
-                : `${NASA_VIDEO_API_URL}/${fileUrl}`;
+                : `${NASA_ASSETS_URL}/${fileUrl}`;
 
             const response = await axios.get(fullUrl);
             return response.data;
         } catch (error) {
-            console.error('Error fetching video file:', error);
+            console.error('Error fetching media file:', error);
             throw error;
         }
     },
