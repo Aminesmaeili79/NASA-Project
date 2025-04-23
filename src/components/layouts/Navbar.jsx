@@ -1,9 +1,5 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
-/**
- * Navigation bar component that matches the original styling
- */
 const Navbar = () => {
     return (
         <nav>
@@ -20,7 +16,7 @@ const Navbar = () => {
             </div>
             <div className="links">
                 <Link to="#">How Does It Work?</Link>
-                <Link to="#">About Me</Link>
+                <Link to="https://www.github.com/aminesmaeili79">About Me</Link>
             </div>
         </nav>
     );

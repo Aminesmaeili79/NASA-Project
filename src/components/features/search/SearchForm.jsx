@@ -1,10 +1,6 @@
-import React from 'react';
 import { Input } from '../../common/Input';
 import { Button } from '../../common/Button';
 
-/**
- * Search form component for NASA media
- */
 const SearchForm = ({
                         query,
                         setQuery,

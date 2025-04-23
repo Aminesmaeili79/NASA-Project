@@ -1,9 +1,5 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
-/**
- * Footer component
- */
 const Footer = () => {
     const currentYear = new Date().getFullYear();
 
@@ -11,7 +7,6 @@ const Footer = () => {
         <footer className="bg-black/50 backdrop-blur-sm py-8 mt-auto">
             <div className="container mx-auto px-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* NASA Information */}
                     <div>
                         <h3 className="text-xl font-bold mb-4">NASA Project</h3>
                         <p className="text-gray-400">
@@ -20,7 +15,6 @@ const Footer = () => {
                         </p>
                     </div>
 
-                    {/* Quick Links */}
                     <div>
                         <h3 className="text-xl font-bold mb-4">Quick Links</h3>
                         <ul className="space-y-2">
@@ -57,7 +51,6 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* API Information */}
                     <div>
                         <h3 className="text-xl font-bold mb-4">NASA API</h3>
                         <p className="text-gray-400 mb-2">

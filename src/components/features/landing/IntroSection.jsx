@@ -1,5 +1,3 @@
-// src/components/features/landing/IntroSection.jsx
-import React from 'react';
 import img9 from '../../../assets/img-11.jpg';
 import img10 from '../../../assets/img-12.webp';
 

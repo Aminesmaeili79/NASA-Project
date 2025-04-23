@@ -3,9 +3,6 @@ import { MediaDisplay } from '../../common/MediaDisplay';
 import { Loading } from '../../common/Loading';
 import { nasaApi } from '../../../services/nasaApi';
 
-/**
- * Component to display media (image, video, audio) in an article
- */
 const ArticleMedia = ({
                           articleData,
                           mediaType = 'image',
@@ -17,18 +14,15 @@ const ArticleMedia = ({
     const [error, setError] = useState(null);
     const [debug, setDebug] = useState({});
 
-    // Set fallback URL from article links
     useEffect(() => {
         if (articleData?.links && articleData.links[0]?.href) {
             setFallbackUrl(articleData.links[0].href);
-            // Default media URL is the first link if no specific media URL is set yet
             if (!mediaUrl) {
                 setMediaUrl(articleData.links[0].href);
             }
         }
-    }, [articleData]);
+    }, [articleData, mediaUrl]);
 
-    // Fetch media URL based on mediaType
     useEffect(() => {
         const fetchMediaUrl = async () => {
             if (!articleData || !articleData.data || !articleData.data[0]) {
@@ -50,13 +44,11 @@ const ArticleMedia = ({
 
                 let assetDetails;
 
-                // Get asset details based on media type
                 if (mediaType === 'video') {
                     assetDetails = await nasaApi.getVideoAssetDetails(nasaId);
                 } else if (mediaType === 'audio') {
                     assetDetails = await nasaApi.getAudioAssetDetails(nasaId);
                 } else {
-                    // For images, we likely already have the URL from the links
                     setLoading(false);
                     return;
                 }
@@ -69,33 +61,40 @@ const ArticleMedia = ({
                 if (assetDetails && assetDetails.collection && assetDetails.collection.items) {
                     let mediaFile = null;
 
-                    // Find appropriate file based on media type
                     if (mediaType === 'video') {
                         mediaFile = assetDetails.collection.items.find(item =>
                             item.href && item.href.endsWith('.mp4')
                         );
                     } else if (mediaType === 'audio') {
-                        // Look for common audio formats
                         mediaFile = assetDetails.collection.items.find(item =>
                                 item.href && (
                                     item.href.endsWith('.mp3') ||
                                     item.href.endsWith('.wav') ||
                                     item.href.endsWith('.ogg') ||
-                                    item.href.endsWith('.m4a')
+                                    item.href.endsWith('.m4a') ||
+                                    item.href.endsWith('.mp4a') ||
+                                    item.href.includes('audio') ||
+                                    item.href.includes('sound')
                                 )
                         );
 
-                        // Log all available files to help with debugging
-                        debugInfo.availableFiles = assetDetails.collection.items
-                            .filter(item => item.href)
-                            .map(item => item.href);
+                        if (!mediaFile) {
+                            const availableFiles = assetDetails.collection.items
+                                .filter(item => item.href)
+                                .map(item => item.href);
+
+                            debugInfo.availableFiles = availableFiles;
+
+                            if (availableFiles.length > 0) {
+                                mediaFile = assetDetails.collection.items[0];
+                            }
+                        }
                     }
 
                     if (mediaFile) {
                         debugInfo.foundMediaFile = mediaFile.href;
                         setMediaUrl(mediaFile.href);
                     } else {
-                        // Try getting manifest for additional info
                         let manifest;
 
                         if (mediaType === 'video') {
@@ -140,8 +139,7 @@ const ArticleMedia = ({
         return <Loading />;
     }
 
-    // Add development-only debugging display
-    const showDebugInfo = process.env.NODE_ENV === 'development';
+    const showDebugInfo = import.meta.env.NODE_ENV === 'development';
 
     return (
         <div className="article-media">
@@ -170,8 +168,8 @@ const ArticleMedia = ({
                     <details>
                         <summary className="cursor-pointer font-bold">Debug Info</summary>
                         <pre className="mt-2 overflow-auto max-h-60">
-              {JSON.stringify(debug, null, 2)}
-            </pre>
+                            {JSON.stringify(debug, null, 2)}
+                        </pre>
                     </details>
                 </div>
             )}

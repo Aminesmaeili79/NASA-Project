@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const NASA_API_BASE_URL = 'https://images-api.nasa.gov';
 const NASA_ASSETS_URL = 'https://images-assets.nasa.gov';
-const NASA_API_KEY = import.meta.env.NASA_API_KEY;
+const NASA_API_KEY = import.meta.env.VITE_NASA_API_KEY;
 
 // Create axios instance with default configuration
 const apiClient = axios.create({
@@ -29,6 +29,8 @@ apiClient.interceptors.response.use(
             console.error('Request error:', error.message);
         }
 
+        // Add a custom error message for users
+        error.customMessage = 'Unable to connect to NASA API. Please try again later.';
         return Promise.reject(error);
     }
 );
@@ -74,16 +76,23 @@ export const nasaApi = {
      */
     searchMedia: async (query, mediaType = '', page = 1, pageSize = 20) => {
         return withRetry(async () => {
-            const response = await apiClient.get('/search', {
-                params: {
-                    q: query,
-                    media_type: mediaType,
-                    page,
-                    page_size: pageSize,
-                    api_key: NASA_API_KEY
-                }
-            });
+            const params = {
+                q: query,
+                page,
+                page_size: pageSize
+            };
 
+            // Only add media_type if it's specified (to avoid filtering too much)
+            if (mediaType) {
+                params.media_type = mediaType;
+            }
+
+            // Add API key if available
+            if (NASA_API_KEY) {
+                params.api_key = NASA_API_KEY;
+            }
+
+            const response = await apiClient.get('/search', { params });
             return response.data;
         });
     },
@@ -95,11 +104,8 @@ export const nasaApi = {
      */
     getVideoAssetDetails: async (nasaId) => {
         return withRetry(async () => {
-            const response = await apiClient.get(`/asset/${nasaId}`, {
-                params: {
-                    api_key: NASA_API_KEY
-                }
-            });
+            const params = NASA_API_KEY ? { api_key: NASA_API_KEY } : {};
+            const response = await apiClient.get(`/asset/${nasaId}`, { params });
             return response.data;
         });
     },
@@ -111,11 +117,8 @@ export const nasaApi = {
      */
     getAudioAssetDetails: async (nasaId) => {
         return withRetry(async () => {
-            const response = await apiClient.get(`/asset/${nasaId}`, {
-                params: {
-                    api_key: NASA_API_KEY
-                }
-            });
+            const params = NASA_API_KEY ? { api_key: NASA_API_KEY } : {};
+            const response = await apiClient.get(`/asset/${nasaId}`, { params });
             return response.data;
         });
     },
@@ -127,11 +130,8 @@ export const nasaApi = {
      */
     getVideoManifest: async (nasaId) => {
         return withRetry(async () => {
-            const response = await apiClient.get(`/asset/${nasaId}/metadata`, {
-                params: {
-                    api_key: NASA_API_KEY
-                }
-            });
+            const params = NASA_API_KEY ? { api_key: NASA_API_KEY } : {};
+            const response = await apiClient.get(`/asset/${nasaId}/metadata`, { params });
             return response.data;
         });
     },
@@ -143,12 +143,20 @@ export const nasaApi = {
      */
     getAudioManifest: async (nasaId) => {
         return withRetry(async () => {
-            const response = await apiClient.get(`/asset/${nasaId}/metadata`, {
-                params: {
-                    api_key: NASA_API_KEY
+            const params = NASA_API_KEY ? { api_key: NASA_API_KEY } : {};
+            try {
+                const response = await apiClient.get(`/asset/${nasaId}/metadata`, { params });
+                return response.data;
+            } catch (error) {
+                console.log(`Error getting audio manifest for ${nasaId}, trying alternative endpoints`);
+                // Some NASA audio might use different endpoints, try a fallback
+                try {
+                    const fallbackResponse = await apiClient.get(`/audio/${nasaId}/metadata`, { params });
+                    return fallbackResponse.data;
+                } catch (fallbackError) {
+                    throw error; // If fallback fails, throw the original error
                 }
-            });
-            return response.data;
+            }
         });
     },
 
@@ -163,7 +171,9 @@ export const nasaApi = {
                 ? fileUrl
                 : `${NASA_ASSETS_URL}/${fileUrl}`;
 
-            const response = await axios.get(fullUrl);
+            const response = await axios.get(fullUrl, {
+                responseType: 'blob', // Important for binary files like audio/video
+            });
             return response.data;
         } catch (error) {
             console.error('Error fetching media file:', error);
@@ -178,11 +188,8 @@ export const nasaApi = {
      */
     getAssetById: async (nasaId) => {
         return withRetry(async () => {
-            const response = await apiClient.get(`/asset/${nasaId}`, {
-                params: {
-                    api_key: NASA_API_KEY
-                }
-            });
+            const params = NASA_API_KEY ? { api_key: NASA_API_KEY } : {};
+            const response = await apiClient.get(`/asset/${nasaId}`, { params });
             return response.data;
         });
     }

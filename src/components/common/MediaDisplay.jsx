@@ -1,4 +1,5 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
+import AudioPlayer from './AudioPlayer';
 
 export const MediaDisplay = ({
                                  mediaType = 'image',
@@ -85,24 +86,22 @@ export const MediaDisplay = ({
         case 'audio':
             return (
                 <div className={containerClasses}>
-                    <audio
-                        controls
-                        className="w-full"
+                    <AudioPlayer
                         src={mediaUrl}
-                        onError={handleError}
-                        onLoadedData={handleLoad}
-                    >
-                        Your browser does not support the audio tag.
-                    </audio>
-                    {fallbackUrl && (
-                        <div className="mt-4">
-                            <img
-                                src={fallbackUrl}
-                                alt={`${title} (illustration)`}
-                                className="w-full rounded-lg shadow-lg"
-                                onLoad={handleLoad}
-                                onError={() => setError(true)}
-                            />
+                        title={title}
+                        fallbackImage={fallbackUrl}
+                        onError={() => {
+                            handleError();
+                            setError(true);
+                        }}
+                        className="shadow-md"
+                    />
+
+                    {error && !fallbackUrl && (
+                        <div className="mt-4 p-4 bg-red-50 border border-red-100 rounded-lg">
+                            <p className="text-red-600 text-sm">
+                                There was an issue loading this audio file. The format may not be supported by your browser.
+                            </p>
                         </div>
                     )}
                 </div>

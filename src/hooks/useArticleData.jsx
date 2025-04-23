@@ -1,13 +1,7 @@
-// src/hooks/useArticleData.js
 import { useState, useEffect, useCallback } from 'react';
 import { nasaApi } from '../services/nasaApi';
 
-/**
- * Custom hook for handling article services
- * @param {Object} initialArticle - Initial article services
- * @param {string} initialType - Initial media type
- * @returns {Object} Article-related state and functions
- */
+
 export const useArticleData = (initialArticle = null, initialType = '') => {
     const [article, setArticleData] = useState(initialArticle);
     const [articleType, setArticleType] = useState(initialType);
@@ -15,7 +9,6 @@ export const useArticleData = (initialArticle = null, initialType = '') => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // Set article services
     const setArticle = useCallback((newArticle, type = '') => {
         setArticleData(newArticle);
         if (type) {
@@ -23,7 +16,6 @@ export const useArticleData = (initialArticle = null, initialType = '') => {
         }
     }, []);
 
-    // Fetch article by title
     const fetchArticleByTitle = useCallback(async (title) => {
         if (!title) return;
 
@@ -63,7 +55,6 @@ export const useArticleData = (initialArticle = null, initialType = '') => {
         }
     }, [setArticle]);
 
-    // Fetch video URL if article is a video
     useEffect(() => {
         const fetchVideoUrl = async () => {
             if (article && articleType === 'video') {
@@ -87,13 +78,11 @@ export const useArticleData = (initialArticle = null, initialType = '') => {
                         if (mp4File) {
                             setMediaUrl(mp4File.href);
                         } else {
-                            // Try getting manifest
                             const manifest = await nasaApi.getVideoManifest(nasaId);
 
                             if (manifest && manifest.location) {
                                 setMediaUrl(manifest.location);
                             } else if (article.links && article.links[0]?.href) {
-                                // Use preview URL as fallback
                                 setMediaUrl(article.links[0].href);
                                 console.warn("Using preview URL as fallback - may not be a video");
                             }
@@ -108,7 +97,6 @@ export const useArticleData = (initialArticle = null, initialType = '') => {
                     setLoading(false);
                 }
             } else if (article && article.links && article.links[0]?.href) {
-                // For non-video content, use the first link
                 setMediaUrl(article.links[0].href);
             }
         };

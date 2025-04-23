@@ -3,34 +3,26 @@ import gsap from 'gsap';
 import { CustomEase } from 'gsap/all';
 import SplitType from 'split-type';
 
-/**
- * Custom hook for managing GSAP animations
- * @returns {Object} Animation-related state and functions
- */
+
 export const useAnimation = () => {
     const [hasAnimationPlayed, setHasAnimationPlayed] = useState(false);
 
-    // Register GSAP plugins
     useEffect(() => {
         gsap.registerPlugin(CustomEase);
         CustomEase.create("hop", "0.9, 0, 0.1, 1");
     }, []);
 
-    // Initialize the animation
     const initAnimation = useCallback(() => {
-        // Skip animation if it has already played
         if (hasAnimationPlayed) {
             skipToFinalState();
             return;
         }
 
-        // Create the animation
         setupInitialStates();
         createAnimationTimelines();
         setHasAnimationPlayed(true);
     }, [hasAnimationPlayed]);
 
-    // Set up initial states for animation
     const setupInitialStates = useCallback(() => {
         gsap.set("nav", {
             y: "-125%",
@@ -90,13 +82,11 @@ export const useAnimation = () => {
         });
     }, []);
 
-    // Create animation timelines
     const createAnimationTimelines = useCallback(() => {
         const overlayTimeline = gsap.timeline();
         const imagesTimeline = gsap.timeline();
         const textTimeline = gsap.timeline();
 
-        // Overlay animations
         overlayTimeline.to(".logo-line-1", {
             backgroundPosition: "0% 0%",
             color: "#fff",

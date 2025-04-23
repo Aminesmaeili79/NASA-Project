@@ -1,11 +1,7 @@
-import React from 'react';
 import SearchResultItem from './SearchResultItem.jsx';
 import { Loading } from '../../common/Loading';
 import { Pagination } from '../../common/Pagination';
 
-/**
- * Component to display search results with pagination
- */
 const SearchResults = ({
                            results,
                            loading,
@@ -39,7 +35,7 @@ const SearchResults = ({
     }
 
     if (results.length === 0 && !lastSearchedQuery) {
-        return null; // Don't show anything before first search
+        return null;
     }
 
     return (
@@ -60,7 +56,6 @@ const SearchResults = ({
                 ))}
             </div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
                 <Pagination
                     currentPage={currentPage}

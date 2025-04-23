@@ -1,15 +1,10 @@
-import React, { createContext, useState, useContext } from 'react';
+import { createContext, useState, useContext } from 'react';
 
-// Create context
 const AnimationContext = createContext();
 
-/**
- * Provider component for animation context
- */
 export const AnimationProvider = ({ children }) => {
     const [hasAnimationPlayed, setHasAnimationPlayed] = useState(false);
 
-    // Context value
     const value = {
         hasAnimationPlayed,
         setHasAnimationPlayed
@@ -22,9 +17,6 @@ export const AnimationProvider = ({ children }) => {
     );
 };
 
-/**
- * Custom hook to use animation context
- */
 export const useAnimation = () => {
     const context = useContext(AnimationContext);
 

@@ -1,10 +1,4 @@
-import React from 'react';
-
-/**
- * Article header component
- */
 const ArticleHeader = ({ title, date }) => {
-    // Format date if it exists
     const formattedDate = date ? date.split('T')[0] : '';
 
     return (

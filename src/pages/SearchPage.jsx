@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { nasaApi } from '../services/nasaApi';
 import { ArticleContext } from '../context/ArticleContext';
@@ -16,7 +16,7 @@ const SearchPage = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [totalResults, setTotalResults] = useState(0);
     const [lastSearchedQuery, setLastSearchedQuery] = useState('');
-    const pageSize = 20;
+    const pageSize = 24;
 
     const handleType = (type) => {
         const updatedTypes = [...searchType];
@@ -132,29 +132,29 @@ const SearchPage = () => {
         };
 
         return (
-            <div className="pagination flex justify-center items-center mt-8 mb-12 gap-2">
+            <div className="pagination flex justify-center items-center gap-6">
                 <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage <= 1 || loading}
-                    className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+                    className="pagination-button disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer opacity-75 not-disabled:hover:opacity-100"
                     aria-label="Previous page"
                 >
                     Previous
                 </button>
 
-                <div className="page-numbers flex gap-1">
+                <div className="page-numbers flex gap-2">
                     {renderPageNumbers().map((page, index) => (
                         page === '...' ? (
-                            <span key={`ellipsis-${index}`} className="px-3 py-2">...</span>
+                            <span key={`ellipsis-${index}`} className="px-3 py-2 text-[1.2rem] flex items-center">.  .  .</span>
                         ) : (
                             <button
                                 key={`page-${page}`}
                                 onClick={() => handlePageChange(page)}
                                 disabled={page === currentPage || loading}
-                                className={`px-3 py-1 rounded ${
+                                className={`pagination-number px-3 py-1 rounded ${
                                     page === currentPage
-                                        ? 'bg-blue-700 text-white'
-                                        : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                                        ? 'bg-blue-900 text-white'
+                                        : 'bg-blue-700 hover:bg-blue-800'
                                 }`}
                                 aria-current={page === currentPage ? 'page' : undefined}
                                 aria-label={`Page ${page}`}
@@ -168,7 +168,7 @@ const SearchPage = () => {
                 <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage >= totalPages || loading}
-                    className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+                    className="pagination-button disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer opacity-75 not-disabled:hover:opacity-100"
                     aria-label="Next page"
                 >
                     Next
@@ -237,7 +237,7 @@ const SearchPage = () => {
             </form>
 
             {results.length > 0 && !loading && (
-                <div className="search-results-info text-center mt-8 mb-4">
+                <div className="search-results-info text-center">
                     <h2 className="text-2xl">
                         {totalResults > 0
                             ? `Found ${totalResults.toLocaleString()} results for "${lastSearchedQuery}"`
@@ -321,16 +321,15 @@ const SearchPage = () => {
                             )}
 
                             {item.data?.[0]?.media_type && (
-                                <div className="absolute top-2 right-2 bg-blue-600 text-white px-2 py-1 rounded text-xs">
+                                <div className="article-type__tag absolute top-2 right-2 bg-blue-600 text-white rounded text-xs">
                                     {item.data[0].media_type}
                                 </div>
                             )}
                         </div>
 
                         <div className="result-info flex flex-col gap-2 flex-grow">
-                            <h3 className="font-semibold line-clamp-2">{item.data?.[0]?.title || 'Untitled'}</h3>
-                            <p className="line-clamp-3 text-sm">{item.data?.[0]?.description?.substring(0, 100)}...</p>
-                            <p className="date text-xs mt-auto">{item.data?.[0]?.date_created?.split('T')[0]}</p>
+                            <h3 className="text-[2.4rem] font-semibold line-clamp-2">{item.data?.[0]?.title || 'Untitled'}</h3>
+                            <p className="date text-[1.2rem] mt-auto">{item.data?.[0]?.date_created?.split('T')[0]}</p>
                         </div>
                     </Link>
                 ))}

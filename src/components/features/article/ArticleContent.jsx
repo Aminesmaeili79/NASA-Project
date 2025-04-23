@@ -1,9 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button } from '../../common/Button';
 
-/**
- * Component to display article content/description
- */
 const ArticleContent = ({
                             description,
                             keywords = [],
@@ -11,10 +8,8 @@ const ArticleContent = ({
                         }) => {
     const [expanded, setExpanded] = useState(initialExpanded);
 
-    // Check if content is long enough to need expansion
     const isLongContent = description && description.length > 300;
 
-    // Toggle expanded state
     const toggleExpanded = () => {
         setExpanded(!expanded);
     };

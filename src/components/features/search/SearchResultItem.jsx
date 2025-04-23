@@ -1,36 +1,28 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
-/**
- * Individual search result item
- */
 const SearchResultItem = ({
                               item,
                               onSelect,
                               baseUrl = '/NASA-Project/search'
                           }) => {
-    // Determine media type
     const determineMediaType = () => {
         if (item.data?.[0]?.media_type) {
             return item.data[0].media_type;
         }
-        return 'image'; // Default to image
+        return 'image';
     };
 
-    // Format date
     const formatDate = (dateString) => {
         if (!dateString) return '';
         return dateString.split('T')[0];
     };
 
-    // Truncate description
     const truncateDescription = (text, maxLength = 100) => {
         if (!text) return '';
         if (text.length <= maxLength) return text;
         return text.substring(0, maxLength) + '...';
     };
 
-    // Handle item selection
     const handleSelect = () => {
         if (onSelect) {
             onSelect(item, determineMediaType());
