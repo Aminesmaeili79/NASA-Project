@@ -15,7 +15,7 @@ const Navbar = () => {
                 <Link to="/NASA-Project/">NASA<br />PROJECT</Link>
             </div>
             <div className="links">
-                <Link to="#">How Does It Work?</Link>
+                <Link to="https://github.com/Aminesmaeili79/NASA-Project?tab=readme-ov-file#nasa-media-explorer">How Does It Work?</Link>
                 <Link to="https://www.github.com/aminesmaeili79">About Me</Link>
             </div>
         </nav>
