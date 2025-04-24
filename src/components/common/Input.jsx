@@ -21,7 +21,7 @@ export const Input = ({
     ].join(' ');
 
     return (
-        <div className="w-full">
+        <div className="w-[90vw]">
             {label && (
                 <label
                     htmlFor={id || name}

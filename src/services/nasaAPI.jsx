@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 const NASA_API_BASE_URL = 'https://images-api.nasa.gov';
-const NASA_ASSETS_URL = 'https://images-assets.nasa.gov';
 const NASA_API_KEY = import.meta.env.VITE_NASA_API_KEY;
 
 const apiClient = axios.create({
@@ -36,13 +35,11 @@ const withRetry = async (requestFn, maxRetries = 2, delay = 1000) => {
         } catch (error) {
             lastError = error;
 
-            // Only retry on network errors or server errors (5xx)
             if (!error.response || (error.response.status >= 500 && error.response.status < 600)) {
                 console.log(`Attempt ${attempt + 1} failed, retrying in ${delay}ms...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
-                delay *= 2; // Exponential backoff
+                delay *= 2;
             } else {
-                // Don't retry on client errors (4xx)
                 break;
             }
         }

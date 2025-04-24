@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArticleContext } from '../context/ArticleContext';
 import { nasaApi } from "../services/nasaApi";
 import ArticleHeader from '../components/features/article/ArticleHeader';
-import ArticleContent from '../components/features/article/ArticleContent';
 import ArticleMedia from '../components/features/article/ArticleMedia';
 
 const ArticlePage = () => {
@@ -96,7 +95,6 @@ const ArticlePage = () => {
         );
     }
 
-    // Set initial state for the article context
     useEffect(() => {
         if (articleContextRef.current) {
             articleContextRef.current.classList.add("context-hidden");

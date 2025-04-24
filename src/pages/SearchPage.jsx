@@ -53,7 +53,6 @@ const SearchPage = () => {
             setResults(data.collection.items);
             setLastSearchedQuery(query);
 
-            // Set pagination data
             if (data.collection?.metadata?.total_hits) {
                 const totalHits = parseInt(data.collection.metadata.total_hits);
                 setTotalResults(totalHits);
@@ -76,55 +75,45 @@ const SearchPage = () => {
     const handlePageChange = (newPage) => {
         if (newPage < 1 || newPage > totalPages || loading) return;
 
-        window.scrollTo(0, 0); // Scroll to top when changing pages
+        window.scrollTo(0, 0);
         handleSearch(null, newPage);
     };
 
-    // Render pagination component
     const renderPagination = () => {
         if (totalPages <= 1 || results.length === 0) return null;
 
-        // Calculate what page numbers to show
         const renderPageNumbers = () => {
             const pageNumbers = [];
             const maxPagesToShow = 5;
 
             if (totalPages <= maxPagesToShow) {
-                // Show all pages if there are few
                 for (let i = 1; i <= totalPages; i++) {
                     pageNumbers.push(i);
                 }
             } else {
-                // Always show first page
                 pageNumbers.push(1);
 
-                // Calculate start and end of page range around current page
                 let start = Math.max(2, currentPage - 1);
                 let end = Math.min(totalPages - 1, currentPage + 1);
 
-                // Adjust if we're near the start or end
                 if (currentPage <= 3) {
                     end = Math.min(totalPages - 1, 4);
                 } else if (currentPage >= totalPages - 2) {
                     start = Math.max(2, totalPages - 3);
                 }
 
-                // Add ellipsis after first page if needed
                 if (start > 2) {
                     pageNumbers.push('...');
                 }
 
-                // Add page numbers around current page
                 for (let i = start; i <= end; i++) {
                     pageNumbers.push(i);
                 }
 
-                // Add ellipsis before last page if needed
                 if (end < totalPages - 1) {
                     pageNumbers.push('...');
                 }
 
-                // Always show last page
                 pageNumbers.push(totalPages);
             }
 

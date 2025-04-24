@@ -281,16 +281,15 @@ title h1 {
 }
 
 .search__box {
-  width: 100%;
+  max-width: 90%;
   position: relative;
 }
 
 .search-input {
   letter-spacing: 1px;
   font-size: 1.6rem;
-  padding: .4em .8em ;
+  padding: .4em .8em;
   border-radius: 1em;
-  width: 100%;
   background-color: var(--color-text);
   color: var(--color-bg);
   opacity: .8;
@@ -335,7 +334,7 @@ title h1 {
 .results {
   padding: 2em 4em;
   margin-top: 4em;
-  letter-spacing: .4px;
+  letter-spacing: 0.4px;
   font-size: 1.6rem;
 }
 
@@ -404,6 +403,107 @@ title h1 {
   justify-content: center;
   align-items: center;
   padding: .4em;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1em 2.4em;
+  color: white;
+  position: relative;
+}
+
+.nav-logo {
+  justify-content: start;
+  text-align: center;
+  z-index: 10;
+}
+
+.nav-logo a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+}
+
+.nav-links {
+  display: flex;
+  justify-content: end;
+  gap: 1.5rem;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  color: #fc3d21;
+}
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: end;
+  width: 30px;
+  height: 21px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.hamburger-line {
+  width: 30px;
+  height: 3px;
+  background-color: white;
+  transition: all 0.3s ease;
+}
+
+.hamburger-line.open:nth-child(1) {
+  transform: translateY(9px) rotate(45deg);
+}
+
+.hamburger-line.open:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-line.open:nth-child(3) {
+  transform: translateY(-9px) rotate(-45deg);
+}
+
+@media (max-width: 768px) {
+  .hamburger {
+    display: flex;
+  }
+
+  .nav-links {
+    position: absolute;
+    flex-direction: column;
+    background-color: #0b3d91;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 70%;
+    max-width: 300px;
+    padding: 80px 30px 30px 30px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 5;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-links.open {
+    transform: translateX(0);
+  }
+
+  .nav-links a {
+    font-size: 1.2rem;
+    padding: 10px 0;
+  }
 }
 
 @media (max-width: 900px) {
